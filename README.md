@@ -30,3 +30,13 @@ https://bscscan.com/myapikey
 go run bscscanapi.go
 you will see api connect on log
 ````
+
+````
+2) setup app database and basic data 
+make pullpostgres
+make installmigration
+make migrationcheck
+make postgres
+make createdb
+make dbup
+````
