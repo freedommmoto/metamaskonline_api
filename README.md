@@ -2,7 +2,7 @@
 api connect to bscscan and line api 
 
 ````
-on mac : 
+1) make poc line api work 
 
 brew install ngrok/ngrok/ngrok
 ngrok http 8888
@@ -16,4 +16,17 @@ https://account.line.biz/login
 go run lineapi.go
 enter 0.0.0.0:8080/testpush
 enter any text on line channel
+````
+
+````
+2) make poc bsc api work 
+cd poc
+vim bscscanapi.go
+****
+change tokenapi to you token 
+you can get tokenapi for free by enter this link 
+https://bscscan.com/myapikey
+****
+go run bscscanapi.go
+you will see api connect on log
 ````
