@@ -32,7 +32,7 @@ you will see api connect on log
 ````
 
 ````
-2) setup app database and basic data 
+3) setup app database and basic data 
 make pullpostgres
 make installmigration
 make migrationcheck

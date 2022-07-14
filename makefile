@@ -21,3 +21,9 @@ dbup:
 
 dbdown:
 	migrate -path model/migration -database "postgresql://root:secret@localhost:5432/metamaskonline?sslmode=disable" -verbose down
+
+installsqlc:
+	brew install sqlc
+
+sqlc:
+	sqlc generate
