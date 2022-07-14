@@ -9,14 +9,14 @@ import (
 	"context"
 )
 
-const selectChainByChainCode = `-- name: selectChainByChainCode :one
+const selectChainByChainCode = `-- name: SelectChainByChainCode :one
 select id_chain, chain_code, chain_name, url_api, created_at, modified, deleted
 from chain
 where chain_code = $1
 and deleted is null
 `
 
-func (q *Queries) selectChainByChainCode(ctx context.Context, chainCode string) (Chain, error) {
+func (q *Queries) SelectChainByChainCode(ctx context.Context, chainCode string) (Chain, error) {
 	row := q.db.QueryRowContext(ctx, selectChainByChainCode, chainCode)
 	var i Chain
 	err := row.Scan(
@@ -31,14 +31,14 @@ func (q *Queries) selectChainByChainCode(ctx context.Context, chainCode string) 
 	return i, err
 }
 
-const selectChainByID = `-- name: selectChainByID :one
+const selectChainByID = `-- name: SelectChainByID :one
 select id_chain, chain_code, chain_name, url_api, created_at, modified, deleted
 from chain
 where id_chain = $1
 and deleted is null
 `
 
-func (q *Queries) selectChainByID(ctx context.Context, idChain int32) (Chain, error) {
+func (q *Queries) SelectChainByID(ctx context.Context, idChain int32) (Chain, error) {
 	row := q.db.QueryRowContext(ctx, selectChainByID, idChain)
 	var i Chain
 	err := row.Scan(

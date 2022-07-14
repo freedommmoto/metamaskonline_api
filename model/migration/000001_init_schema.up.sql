@@ -84,8 +84,6 @@ CREATE INDEX ON "line_owner_validation" ("id_user");
 
 CREATE INDEX ON "users" ("username");
 
-select * from chain;
-
 ALTER TABLE "chain_event" ADD FOREIGN KEY ("wallet_id") REFERENCES "wallet" ("wallet_id");
 
 ALTER TABLE "line_event" ADD FOREIGN KEY ("id_use") REFERENCES "users" ("id_user");
