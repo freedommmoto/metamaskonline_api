@@ -48,7 +48,6 @@ VALUES (1, 'bsc-testnet', 'binance smart chain test net', 'https://api-testnet.b
 INSERT INTO chain (id_chain, chain_code, chain_name, url_api )
 VALUES (2, 'bsc', 'binance smart chain', 'https://api.bscscan.com/api');
 
-
 CREATE TABLE "users" (
                          "id_user" serial PRIMARY KEY,
                          "username" varchar NOT NULL,
