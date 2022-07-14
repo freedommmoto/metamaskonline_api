@@ -36,7 +36,7 @@ type blockPrice struct {
 	BnbusdTimestamp string `json:"ethusd_timestamp"`
 }
 
-var APIKEY = "NYUWXI8WZHDPHW7CYHKKUPEXYZC2BI4IC9"
+var APIKEY = "push_you_key_here"
 var DefaultBNBPrice float64
 
 func getLastPriceBNB() (usd float64, err error) {
