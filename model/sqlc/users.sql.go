@@ -10,6 +10,45 @@ import (
 	"database/sql"
 )
 
+const selectUserAlreadyValidation = `-- name: SelectUserAlreadyValidation :many
+SELECT id_user, username, password, id_line, owner_validation, created_at, modified, deleted
+FROM users
+where owner_validation is true
+  and deleted is null
+`
+
+func (q *Queries) SelectUserAlreadyValidation(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, selectUserAlreadyValidation)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.IDUser,
+			&i.Username,
+			&i.Password,
+			&i.IDLine,
+			&i.OwnerValidation,
+			&i.CreatedAt,
+			&i.Modified,
+			&i.Deleted,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const selectUserByLineUserID = `-- name: SelectUserByLineUserID :one
 select id_user, username, password, id_line, owner_validation, created_at, modified, deleted
 from users
@@ -37,7 +76,7 @@ const selectUserID = `-- name: SelectUserID :one
 select id_user, username, password, id_line, owner_validation, created_at, modified, deleted
 from users
 where id_user = $1
-and deleted is null
+  and deleted is null
 `
 
 func (q *Queries) SelectUserID(ctx context.Context, idUser int32) (User, error) {
@@ -59,8 +98,7 @@ func (q *Queries) SelectUserID(ctx context.Context, idUser int32) (User, error) 
 const updateUserOwnerValidation = `-- name: UpdateUserOwnerValidation :one
 update users
 set owner_validation = true
-where id_user = $1
-RETURNING id_user, username, password, id_line, owner_validation, created_at, modified, deleted
+where id_user = $1 RETURNING id_user, username, password, id_line, owner_validation, created_at, modified, deleted
 `
 
 func (q *Queries) UpdateUserOwnerValidation(ctx context.Context, idUser int32) (User, error) {
