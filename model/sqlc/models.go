@@ -23,8 +23,9 @@ type ChainEvent struct {
 	IDChainEvent         int64          `json:"id_chain_event"`
 	WalletID             int32          `json:"wallet_id"`
 	ActionType           sql.NullString `json:"action_type"`
-	FromMetamaskWalletID sql.NullString `json:"from_metamask_wallet_id"`
-	ToMetamaskWalletID   sql.NullString `json:"to_metamask_wallet_id"`
+	FromMetamaskWalletID string         `json:"from_metamask_wallet_id"`
+	ToMetamaskWalletID   string         `json:"to_metamask_wallet_id"`
+	Value                sql.NullString `json:"value"`
 	LogEvent             sql.NullString `json:"log_event"`
 	CreatedAt            time.Time      `json:"created_at"`
 }
@@ -38,20 +39,20 @@ type Event struct {
 
 type LineEvent struct {
 	IDLineEvent      int64          `json:"id_line_event"`
-	IDLineUser       sql.NullString `json:"id_line_user"`
+	IDLineUser       string         `json:"id_line_user"`
 	IDUse            int32          `json:"id_use"`
 	RequestLogEvent  sql.NullString `json:"request_log_event"`
 	ResponseLogEvent sql.NullString `json:"response_log_event"`
-	Error            sql.NullBool   `json:"error"`
+	Error            bool           `json:"error"`
 	ErrorText        sql.NullString `json:"error_text"`
 	CreatedAt        time.Time      `json:"created_at"`
 }
 
 type LineOwnerValidation struct {
-	IDLineOwnerValidation int32         `json:"id_line_owner_validation"`
-	Code                  string        `json:"code"`
-	IDUser                sql.NullInt32 `json:"id_user"`
-	CreatedAt             time.Time     `json:"created_at"`
+	IDLineOwnerValidation int32     `json:"id_line_owner_validation"`
+	Code                  string    `json:"code"`
+	IDUser                int32     `json:"id_user"`
+	CreatedAt             time.Time `json:"created_at"`
 }
 
 type User struct {
@@ -59,18 +60,19 @@ type User struct {
 	Username        string         `json:"username"`
 	Password        string         `json:"password"`
 	IDLine          sql.NullString `json:"id_line"`
-	OwnerValidation sql.NullBool   `json:"owner_validation"`
+	OwnerValidation bool           `json:"owner_validation"`
 	CreatedAt       time.Time      `json:"created_at"`
 	Modified        time.Time      `json:"modified"`
 	Deleted         sql.NullTime   `json:"deleted"`
 }
 
 type Wallet struct {
-	WalletID         sql.NullInt32  `json:"wallet_id"`
+	WalletID         int32          `json:"wallet_id"`
 	MetamaskWalletID string         `json:"metamask_wallet_id"`
+	FollowWallet     bool           `json:"follow_wallet"`
 	IDUser           int32          `json:"id_user"`
 	IDChain          sql.NullInt32  `json:"id_chain"`
-	LastBlockNumber  sql.NullInt32  `json:"last_block_number"`
+	LastBlockNumber  int32          `json:"last_block_number"`
 	CreatedAt        time.Time      `json:"created_at"`
 	Modified         time.Time      `json:"modified"`
 	Deleted          sql.NullTime   `json:"deleted"`

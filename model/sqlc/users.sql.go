@@ -31,3 +31,26 @@ func (q *Queries) SelectUserID(ctx context.Context, idUser int32) (User, error) 
 	)
 	return i, err
 }
+
+const updateUserOwnerValidation = `-- name: UpdateUserOwnerValidation :one
+update users
+set owner_validation = true
+where id_user = $1
+RETURNING id_user, username, password, id_line, owner_validation, created_at, modified, deleted
+`
+
+func (q *Queries) UpdateUserOwnerValidation(ctx context.Context, idUser int32) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserOwnerValidation, idUser)
+	var i User
+	err := row.Scan(
+		&i.IDUser,
+		&i.Username,
+		&i.Password,
+		&i.IDLine,
+		&i.OwnerValidation,
+		&i.CreatedAt,
+		&i.Modified,
+		&i.Deleted,
+	)
+	return i, err
+}

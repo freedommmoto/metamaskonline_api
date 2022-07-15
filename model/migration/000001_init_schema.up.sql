@@ -2,19 +2,20 @@ CREATE TABLE "chain_event" (
                                "id_chain_event" bigserial PRIMARY KEY,
                                "wallet_id" serial NOT NULL,
                                "action_type" varchar,
-                               "from_metamask_wallet_id" varchar,
-                               "to_metamask_wallet_id" varchar,
+                               "from_metamask_wallet_id" varchar NOT NULL,
+                               "to_metamask_wallet_id" varchar NOT NULL,
+                               "value" varchar NULL,
                                "log_event" text,
                                "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "line_event" (
                               "id_line_event" bigserial PRIMARY KEY,
-                              "id_line_user" varchar,
+                              "id_line_user" varchar NOT NULL,
                               "id_use" serial NOT NULL,
                               "request_log_event" text,
                               "response_log_event" text,
-                              "error" boolean DEFAULT false,
+                              "error" boolean NOT NULL DEFAULT false,
                               "error_text" text,
                               "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
@@ -29,7 +30,7 @@ CREATE TABLE "event" (
 CREATE TABLE "line_owner_validation" (
                                          "id_line_owner_validation" serial PRIMARY KEY,
                                          "code" varchar NOT NULL,
-                                         "id_user" int,
+                                         "id_user" int NOT NULL,
                                          "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
@@ -53,18 +54,19 @@ CREATE TABLE "users" (
                          "username" varchar NOT NULL,
                          "password" varchar NOT NULL,
                          "id_line" varchar,
-                         "owner_validation" boolean DEFAULT false,
+                         "owner_validation" boolean NOT NULL DEFAULT false,
                          "created_at" timestamp NOT NULL DEFAULT 'now()',
                          "modified" timestamp NOT NULL DEFAULT 'now()',
                          "deleted" timestamp
 );
 
 CREATE TABLE "wallet" (
-                          "wallet_id" int unique ,
+                          "wallet_id" serial PRIMARY KEY,
                           "metamask_wallet_id" varchar NOT NULL,
+                          "follow_wallet" boolean NOT NULL DEFAULT false,
                           "id_user" int NOT NULL,
                           "id_chain" int DEFAULT 1,
-                          "last_block_number" int DEFAULT 0,
+                          "last_block_number" int NOT NULL DEFAULT 0,
                           "created_at" timestamp NOT NULL DEFAULT 'now()',
                           "modified" timestamp NOT NULL DEFAULT 'now()',
                           "deleted" timestamp

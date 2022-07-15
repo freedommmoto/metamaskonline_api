@@ -11,15 +11,16 @@ import (
 )
 
 const insertChainEvent = `-- name: InsertChainEvent :one
-INSERT INTO chain_event ( wallet_id, action_type, from_metamask_wallet_id, to_metamask_wallet_id, log_event)
-VALUES ( $1, $2, $3, $4, $5) RETURNING id_chain_event, wallet_id, action_type, from_metamask_wallet_id, to_metamask_wallet_id, log_event, created_at
+INSERT INTO chain_event (wallet_id, action_type, value, from_metamask_wallet_id, to_metamask_wallet_id, log_event)
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id_chain_event, wallet_id, action_type, from_metamask_wallet_id, to_metamask_wallet_id, value, log_event, created_at
 `
 
 type InsertChainEventParams struct {
 	WalletID             int32          `json:"wallet_id"`
 	ActionType           sql.NullString `json:"action_type"`
-	FromMetamaskWalletID sql.NullString `json:"from_metamask_wallet_id"`
-	ToMetamaskWalletID   sql.NullString `json:"to_metamask_wallet_id"`
+	Value                sql.NullString `json:"value"`
+	FromMetamaskWalletID string         `json:"from_metamask_wallet_id"`
+	ToMetamaskWalletID   string         `json:"to_metamask_wallet_id"`
 	LogEvent             sql.NullString `json:"log_event"`
 }
 
@@ -27,6 +28,7 @@ func (q *Queries) InsertChainEvent(ctx context.Context, arg InsertChainEventPara
 	row := q.db.QueryRowContext(ctx, insertChainEvent,
 		arg.WalletID,
 		arg.ActionType,
+		arg.Value,
 		arg.FromMetamaskWalletID,
 		arg.ToMetamaskWalletID,
 		arg.LogEvent,
@@ -38,6 +40,7 @@ func (q *Queries) InsertChainEvent(ctx context.Context, arg InsertChainEventPara
 		&i.ActionType,
 		&i.FromMetamaskWalletID,
 		&i.ToMetamaskWalletID,
+		&i.Value,
 		&i.LogEvent,
 		&i.CreatedAt,
 	)

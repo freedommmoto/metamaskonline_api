@@ -16,11 +16,11 @@ VALUES ( $1, $2, $3, $4, $5, $6) RETURNING id_line_event, id_line_user, id_use, 
 `
 
 type InsertLineEventParams struct {
-	IDLineUser       sql.NullString `json:"id_line_user"`
+	IDLineUser       string         `json:"id_line_user"`
 	IDUse            int32          `json:"id_use"`
 	RequestLogEvent  sql.NullString `json:"request_log_event"`
 	ResponseLogEvent sql.NullString `json:"response_log_event"`
-	Error            sql.NullBool   `json:"error"`
+	Error            bool           `json:"error"`
 	ErrorText        sql.NullString `json:"error_text"`
 }
 

@@ -40,3 +40,11 @@ make postgres
 make createdb
 make dbup
 ````
+
+````
+4) run test 
+make test
+****
+then check data in table event , line-event , block-event
+****
+````
