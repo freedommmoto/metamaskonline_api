@@ -24,8 +24,9 @@ func ReplyMessageLine(c echo.Context, mainQueries *db.Queries, config tool.Confi
 		return err
 	}
 
+	//check with line api make sure is not random lineid in request
 	profile, err := lib.GetProfile(ChannelToken, Line.Events[0].Source.UserID)
-	if err != nil {
+	if err != nil || profile.UserID == "" {
 		log.Println("getProfile error :", err)
 		return err
 	}

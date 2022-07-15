@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type LineMessage struct {
@@ -76,6 +77,11 @@ func GetProfile(ChannelToken, userId string) (ProFile, error) {
 	req.Header.Add("Authorization", "Bearer "+ChannelToken)
 
 	res, err := http.DefaultClient.Do(req)
+	if res.StatusCode != http.StatusOK {
+		statusCodeStr := strconv.Itoa(res.StatusCode)
+		return profile, errors.New("call get profile got http status : " + statusCodeStr)
+	}
+
 	if err != nil {
 		return profile, err
 	}
@@ -95,18 +101,18 @@ func GetProfile(ChannelToken, userId string) (ProFile, error) {
 
 func CheckProfileRegister(Queries *db.Queries, profile ProFile) (db.User, bool, error) {
 	var err error
+	var userNil db.User
+
 	log.Println("CheckProfileRegister ", profile.UserID)
-	userja, err := Queries.SelectUserByLineUserID(context.Background(), sql.NullString{String: profile.UserID, Valid: true})
+	userFromDB, err := Queries.SelectUserByLineUserID(context.Background(), sql.NullString{String: profile.UserID, Valid: true})
 
 	if err != nil {
-		var usernil db.User
-		return usernil, false, err
+		return userNil, false, err
 	}
 
-	if userja.IDUser < 1 {
-		return userja, false, nil
+	if userFromDB.IDUser < 1 {
+		return userNil, false, nil
 	}
-	log.Println("user is !!!  ", userja)
 
-	return userja, true, nil
+	return userFromDB, true, nil
 }
