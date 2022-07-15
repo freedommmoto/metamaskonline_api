@@ -39,11 +39,11 @@ type Event struct {
 
 type LineEvent struct {
 	IDLineEvent      int64          `json:"id_line_event"`
-	IDLineUser       sql.NullString `json:"id_line_user"`
+	IDLineUser       string         `json:"id_line_user"`
 	IDUse            int32          `json:"id_use"`
 	RequestLogEvent  sql.NullString `json:"request_log_event"`
 	ResponseLogEvent sql.NullString `json:"response_log_event"`
-	Error            sql.NullBool   `json:"error"`
+	Error            bool           `json:"error"`
 	ErrorText        sql.NullString `json:"error_text"`
 	CreatedAt        time.Time      `json:"created_at"`
 }

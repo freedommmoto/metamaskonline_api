@@ -11,11 +11,11 @@ CREATE TABLE "chain_event" (
 
 CREATE TABLE "line_event" (
                               "id_line_event" bigserial PRIMARY KEY,
-                              "id_line_user" varchar,
+                              "id_line_user" varchar NOT NULL,
                               "id_use" serial NOT NULL,
                               "request_log_event" text,
                               "response_log_event" text,
-                              "error" boolean DEFAULT false,
+                              "error" boolean NOT NULL DEFAULT false,
                               "error_text" text,
                               "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
