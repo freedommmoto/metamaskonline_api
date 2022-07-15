@@ -17,7 +17,7 @@ where wallet_id = $1
 and deleted is null
 `
 
-func (q *Queries) SelectWalletByID(ctx context.Context, walletID sql.NullInt32) (Wallet, error) {
+func (q *Queries) SelectWalletByID(ctx context.Context, walletID int32) (Wallet, error) {
 	row := q.db.QueryRowContext(ctx, selectWalletByID, walletID)
 	var i Wallet
 	err := row.Scan(
@@ -41,7 +41,7 @@ where wallet_id = $1
 and deleted is null
 `
 
-func (q *Queries) SelectWalletByIDUser(ctx context.Context, walletID sql.NullInt32) ([]Wallet, error) {
+func (q *Queries) SelectWalletByIDUser(ctx context.Context, walletID int32) ([]Wallet, error) {
 	rows, err := q.db.QueryContext(ctx, selectWalletByIDUser, walletID)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ where wallet_id = $1
 and deleted is null
 `
 
-func (q *Queries) SelectWalletByMetamaskWalletID(ctx context.Context, walletID sql.NullInt32) (Wallet, error) {
+func (q *Queries) SelectWalletByMetamaskWalletID(ctx context.Context, walletID int32) (Wallet, error) {
 	row := q.db.QueryRowContext(ctx, selectWalletByMetamaskWalletID, walletID)
 	var i Wallet
 	err := row.Scan(
@@ -108,7 +108,7 @@ RETURNING wallet_id, metamask_wallet_id, id_user, id_chain, last_block_number, c
 
 type UpdateLastBlockNumberParams struct {
 	LastBlockNumber sql.NullInt32 `json:"last_block_number"`
-	WalletID        sql.NullInt32 `json:"wallet_id"`
+	WalletID        int32         `json:"wallet_id"`
 }
 
 func (q *Queries) UpdateLastBlockNumber(ctx context.Context, arg UpdateLastBlockNumberParams) (Wallet, error) {

@@ -2,8 +2,9 @@ CREATE TABLE "chain_event" (
                                "id_chain_event" bigserial PRIMARY KEY,
                                "wallet_id" serial NOT NULL,
                                "action_type" varchar,
-                               "from_metamask_wallet_id" varchar,
-                               "to_metamask_wallet_id" varchar,
+                               "from_metamask_wallet_id" varchar NOT NULL,
+                               "to_metamask_wallet_id" varchar NOT NULL,
+                               "value" varchar NULL,
                                "log_event" text,
                                "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
@@ -60,7 +61,7 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "wallet" (
-                          "wallet_id" int unique ,
+                          "wallet_id" serial PRIMARY KEY,
                           "metamask_wallet_id" varchar NOT NULL,
                           "id_user" int NOT NULL,
                           "id_chain" int DEFAULT 1,

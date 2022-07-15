@@ -23,8 +23,9 @@ type ChainEvent struct {
 	IDChainEvent         int64          `json:"id_chain_event"`
 	WalletID             int32          `json:"wallet_id"`
 	ActionType           sql.NullString `json:"action_type"`
-	FromMetamaskWalletID sql.NullString `json:"from_metamask_wallet_id"`
-	ToMetamaskWalletID   sql.NullString `json:"to_metamask_wallet_id"`
+	FromMetamaskWalletID string         `json:"from_metamask_wallet_id"`
+	ToMetamaskWalletID   string         `json:"to_metamask_wallet_id"`
+	Value                sql.NullString `json:"value"`
 	LogEvent             sql.NullString `json:"log_event"`
 	CreatedAt            time.Time      `json:"created_at"`
 }
@@ -66,7 +67,7 @@ type User struct {
 }
 
 type Wallet struct {
-	WalletID         sql.NullInt32  `json:"wallet_id"`
+	WalletID         int32          `json:"wallet_id"`
 	MetamaskWalletID string         `json:"metamask_wallet_id"`
 	IDUser           int32          `json:"id_user"`
 	IDChain          sql.NullInt32  `json:"id_chain"`
