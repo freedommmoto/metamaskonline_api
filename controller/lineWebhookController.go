@@ -37,28 +37,71 @@ func ReplyMessageLine(c echo.Context, mainQueries *db.Queries, config tool.Confi
 		return err
 	}
 
-	log.Println("ืทำถึงตรงนี้ user is  :", user)
-	return nil
-
+	//regis = false // uncomment this line for test case 1
+	//case 1 user not in database yet mean user not register with UI yet.
 	if !regis {
-		//reply you need to rigsiter first before used this channal
+		messageStr := tool.GetLineText(1)
+		err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
+		if err != nil {
+			log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+			return err
+		}
 		return nil
 	}
 
-	log.Println("end event here ", user)
-	return nil
-
+	//case 2 user register on UI but not send validation code to line group yet.
 	if !user.OwnerValidation {
+		codeCorrect, err := lib.CheckCodeWithUserProfile(mainQueries, Line, user.IDUser)
 
-		//if text code is same on validation
+		if codeCorrect {
+			//case 2.1 user send code correct format but not correct code ex : user send 2123 but in database is 8472
+			err = lib.UpdateUserOwnerValidation(mainQueries, user.IDUser)
+			if err != nil {
+				log.Println("UpdateUserOwnerValidation :", err)
+				return err
+			}
 
-		//reply you need to validation code you can see code in system dashboad
-		return nil
+			messageStr := tool.GetLineText(2)
+			err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
+			if err != nil {
+				log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+				return err
+			}
+		} else {
+			//case 2.2 user send code not correct format maybe send text for ask how system work maybe send a sicker
+			isCorrectFormatCode := lib.CheckCodeFormatIs4Number(Line)
+			if isCorrectFormatCode {
+				messageStr := tool.GetLineText(3)
+				err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
+				if err != nil {
+					log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+					return err
+				}
+
+				_, err := lib.MakeNewCodeForNewUser(mainQueries, user.IDUser)
+				if err != nil {
+					log.Println("error makeNewCodeForNewUser :", err)
+					return err
+				}
+			} else {
+				messageStr := tool.GetLineText(4)
+				err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
+				if err != nil {
+					log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+					return err
+				}
+			}
+		}
+
+	} else {
+		//case 3 user already register user no need to do any chat with line group only wait for alert from metamask action
+		messageStr := tool.GetLineText(5)
+		err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
+		if err != nil {
+			log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+			return err
+		}
 	}
 
-	//check is validation
-	//check is not validation
-
-	log.Println("profile", profile)
 	return nil
 }

@@ -1,15 +1,18 @@
 package lib
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	db "github.com/freedommmoto/metamaskonline_api/model/sqlc"
+	"github.com/freedommmoto/metamaskonline_api/tool"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type LineMessage struct {
@@ -115,4 +118,105 @@ func CheckProfileRegister(Queries *db.Queries, profile ProFile) (db.User, bool, 
 	}
 
 	return userFromDB, true, nil
+}
+
+func CheckCodeWithUserProfile(Queries *db.Queries, lineRequest *LineMessage, userID int32) (bool, error) {
+	lineOwnerValidation, err := Queries.SelectLastLineOwnerValidation(context.Background(), userID)
+	if err != nil {
+		return false, err
+	}
+	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineRequest.Events[0].Message.Text)
+	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineOwnerValidation.Code)
+	if lineOwnerValidation.Code == lineRequest.Events[0].Message.Text {
+		return true, nil
+	}
+	return false, nil
+}
+
+func UpdateUserOwnerValidation(Queries *db.Queries, userID int32) error {
+	if userID < 1 {
+		errors.New("call UpdateUserOwnerValidation with wrong format userid ")
+	}
+	user, err := Queries.UpdateUserOwnerValidation(context.Background(), userID)
+	if err != nil {
+		return err
+	}
+	if user.IDUser != userID {
+		errors.New("id user that update OwnerValidation not correct")
+	}
+	return nil
+}
+
+func MakeNewCodeForNewUser(Queries *db.Queries, userID int32) (string, error) {
+	code := tool.RandomCodeNumber(4)
+	arg := db.InsertLineOwnerValidationParams{
+		IDUser: int32(userID),
+		Code:   code,
+	}
+	lineOwner, err := Queries.InsertLineOwnerValidation(context.Background(), arg)
+	if err != nil {
+		return "", err
+	}
+	length := len([]rune(lineOwner.Code))
+	if length != 4 {
+		err = errors.New("code is not length 4")
+		return "", err
+	}
+	return lineOwner.Code, nil
+}
+
+func CheckCodeFormatIs4Number(lineRequest *LineMessage) bool {
+	message := lineRequest.Events[0].Message.Text
+	length := len([]rune(message))
+	if length != 4 {
+		return false
+	}
+	runes := []rune(message)
+	for i := 0; i < len(runes); i++ {
+		if !strings.Contains(tool.CodeNumber, string(runes[i])) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func ReplyLineUserWithNormalText(messageStr string, ChannelToken string, lineRequest *LineMessage) error {
+
+	message := Message{
+		Type: "text",
+		Text: messageStr,
+	}
+	replyRequest := ReplyRequest{
+		ReplyToken: lineRequest.Events[0].ReplyToken,
+		Messages: []Message{
+			message,
+		},
+	}
+
+	value, _ := json.Marshal(replyRequest)
+	var jsonStr = []byte(value)
+
+	url := "https://api.line.me/v2/bot/message/reply"
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+ChannelToken)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	//log.Println("response Status:", resp.Status)
+	//log.Println("response Headers:", resp.Header)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Println("response Body:", string(body))
+	return nil
 }

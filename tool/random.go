@@ -6,14 +6,14 @@ import (
 )
 
 const alphabetandint = "a1s2d3f4h5s6d7k8f9j0h1w2e3u4r5g6b7r8o9q0w1h2s3d4h5d6g7t8y9p0h1j2f3g4v"
-const codeNumber = "1234567890"
+const CodeNumber = "1234567890"
 
 func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }
 
 func RandomCodeNumber(long int) string {
-	return RandomFormInput(codeNumber, long)
+	return RandomFormInput(CodeNumber, long)
 }
 
 func RandomString(long int) string {
