@@ -30,3 +30,9 @@ sqlc:
 
 test:
 	go test -v -cover ./...
+
+installngrok:
+	brew install ngrok/ngrok/ngrok
+
+mapserver:
+	ngrok http 8888
