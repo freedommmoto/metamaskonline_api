@@ -1,1 +1,4 @@
 .idea
+cron
+server
+app.env

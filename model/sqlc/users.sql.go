@@ -7,7 +7,31 @@ package model
 
 import (
 	"context"
+	"database/sql"
 )
+
+const selectUserByLineUserID = `-- name: SelectUserByLineUserID :one
+select id_user, username, password, id_line, owner_validation, created_at, modified, deleted
+from users
+where id_line = $1
+  and deleted is null
+`
+
+func (q *Queries) SelectUserByLineUserID(ctx context.Context, idLine sql.NullString) (User, error) {
+	row := q.db.QueryRowContext(ctx, selectUserByLineUserID, idLine)
+	var i User
+	err := row.Scan(
+		&i.IDUser,
+		&i.Username,
+		&i.Password,
+		&i.IDLine,
+		&i.OwnerValidation,
+		&i.CreatedAt,
+		&i.Modified,
+		&i.Deleted,
+	)
+	return i, err
+}
 
 const selectUserID = `-- name: SelectUserID :one
 select id_user, username, password, id_line, owner_validation, created_at, modified, deleted
