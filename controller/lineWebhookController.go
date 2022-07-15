@@ -3,14 +3,15 @@ package controller
 import (
 	lib "github.com/freedommmoto/metamaskonline_api/lib"
 	db "github.com/freedommmoto/metamaskonline_api/model/sqlc"
+	"github.com/freedommmoto/metamaskonline_api/tool"
 	echo "github.com/labstack/echo/v4"
 	"log"
 )
 
-var ChannelToken = "tCoBYHVYpw1yAaK+e/UTsWGLUTqYCzSRrzaLoDc8TVX8VolPD19DVm9EektYw0E/eVhXj3uUz0eQ9o4XyoGiPi69+FxZ9PQ9VN/e0jATnI2FgN1gejWy0/dDCxqo7RwqFJXOoWOkbE/UuNLdOG5r+AdB04t89/1O/w1cDnyilFU="
+var ChannelToken string
 
-func ReplyMessageLine(c echo.Context, mainQueries *db.Queries) error {
-
+func ReplyMessageLine(c echo.Context, mainQueries *db.Queries, config tool.ConfigObject) error {
+	ChannelToken = config.LINEToken
 	Line := new(lib.LineMessage)
 	if err := c.Bind(Line); err != nil {
 		log.Println("err Bind LineMessage", err)
