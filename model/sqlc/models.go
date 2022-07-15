@@ -60,7 +60,7 @@ type User struct {
 	Username        string         `json:"username"`
 	Password        string         `json:"password"`
 	IDLine          sql.NullString `json:"id_line"`
-	OwnerValidation sql.NullBool   `json:"owner_validation"`
+	OwnerValidation bool           `json:"owner_validation"`
 	CreatedAt       time.Time      `json:"created_at"`
 	Modified        time.Time      `json:"modified"`
 	Deleted         sql.NullTime   `json:"deleted"`

@@ -54,7 +54,7 @@ CREATE TABLE "users" (
                          "username" varchar NOT NULL,
                          "password" varchar NOT NULL,
                          "id_line" varchar,
-                         "owner_validation" boolean DEFAULT false,
+                         "owner_validation" boolean NOT NULL DEFAULT false,
                          "created_at" timestamp NOT NULL DEFAULT 'now()',
                          "modified" timestamp NOT NULL DEFAULT 'now()',
                          "deleted" timestamp
