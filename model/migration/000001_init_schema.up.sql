@@ -63,9 +63,10 @@ CREATE TABLE "users" (
 CREATE TABLE "wallet" (
                           "wallet_id" serial PRIMARY KEY,
                           "metamask_wallet_id" varchar NOT NULL,
+                          "follow_wallet" boolean NOT NULL DEFAULT false,
                           "id_user" int NOT NULL,
                           "id_chain" int DEFAULT 1,
-                          "last_block_number" int DEFAULT 0,
+                          "last_block_number" int NOT NULL DEFAULT 0,
                           "created_at" timestamp NOT NULL DEFAULT 'now()',
                           "modified" timestamp NOT NULL DEFAULT 'now()',
                           "deleted" timestamp

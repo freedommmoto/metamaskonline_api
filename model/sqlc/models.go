@@ -69,9 +69,10 @@ type User struct {
 type Wallet struct {
 	WalletID         int32          `json:"wallet_id"`
 	MetamaskWalletID string         `json:"metamask_wallet_id"`
+	FollowWallet     bool           `json:"follow_wallet"`
 	IDUser           int32          `json:"id_user"`
 	IDChain          sql.NullInt32  `json:"id_chain"`
-	LastBlockNumber  sql.NullInt32  `json:"last_block_number"`
+	LastBlockNumber  int32          `json:"last_block_number"`
 	CreatedAt        time.Time      `json:"created_at"`
 	Modified         time.Time      `json:"modified"`
 	Deleted          sql.NullTime   `json:"deleted"`

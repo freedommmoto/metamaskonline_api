@@ -7,11 +7,36 @@ package model
 
 import (
 	"context"
-	"database/sql"
 )
 
+const selectFollowWalletByIDUser = `-- name: SelectFollowWalletByIDUser :one
+select wallet_id, metamask_wallet_id, follow_wallet, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
+from wallet
+where id_user = $1
+and follow_wallet = true
+and deleted is null
+`
+
+func (q *Queries) SelectFollowWalletByIDUser(ctx context.Context, idUser int32) (Wallet, error) {
+	row := q.db.QueryRowContext(ctx, selectFollowWalletByIDUser, idUser)
+	var i Wallet
+	err := row.Scan(
+		&i.WalletID,
+		&i.MetamaskWalletID,
+		&i.FollowWallet,
+		&i.IDUser,
+		&i.IDChain,
+		&i.LastBlockNumber,
+		&i.CreatedAt,
+		&i.Modified,
+		&i.Deleted,
+		&i.WalletName,
+	)
+	return i, err
+}
+
 const selectWalletByID = `-- name: SelectWalletByID :one
-select wallet_id, metamask_wallet_id, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
+select wallet_id, metamask_wallet_id, follow_wallet, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
 from wallet
 where wallet_id = $1
 and deleted is null
@@ -23,6 +48,7 @@ func (q *Queries) SelectWalletByID(ctx context.Context, walletID int32) (Wallet,
 	err := row.Scan(
 		&i.WalletID,
 		&i.MetamaskWalletID,
+		&i.FollowWallet,
 		&i.IDUser,
 		&i.IDChain,
 		&i.LastBlockNumber,
@@ -35,14 +61,14 @@ func (q *Queries) SelectWalletByID(ctx context.Context, walletID int32) (Wallet,
 }
 
 const selectWalletByIDUser = `-- name: SelectWalletByIDUser :many
-select wallet_id, metamask_wallet_id, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
+select wallet_id, metamask_wallet_id, follow_wallet, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
 from wallet
-where wallet_id = $1
+where id_user = $1
 and deleted is null
 `
 
-func (q *Queries) SelectWalletByIDUser(ctx context.Context, walletID int32) ([]Wallet, error) {
-	rows, err := q.db.QueryContext(ctx, selectWalletByIDUser, walletID)
+func (q *Queries) SelectWalletByIDUser(ctx context.Context, idUser int32) ([]Wallet, error) {
+	rows, err := q.db.QueryContext(ctx, selectWalletByIDUser, idUser)
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +79,7 @@ func (q *Queries) SelectWalletByIDUser(ctx context.Context, walletID int32) ([]W
 		if err := rows.Scan(
 			&i.WalletID,
 			&i.MetamaskWalletID,
+			&i.FollowWallet,
 			&i.IDUser,
 			&i.IDChain,
 			&i.LastBlockNumber,
@@ -75,18 +102,19 @@ func (q *Queries) SelectWalletByIDUser(ctx context.Context, walletID int32) ([]W
 }
 
 const selectWalletByMetamaskWalletID = `-- name: SelectWalletByMetamaskWalletID :one
-select wallet_id, metamask_wallet_id, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
+select wallet_id, metamask_wallet_id, follow_wallet, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
 from wallet
-where wallet_id = $1
+where metamask_wallet_id = $1
 and deleted is null
 `
 
-func (q *Queries) SelectWalletByMetamaskWalletID(ctx context.Context, walletID int32) (Wallet, error) {
-	row := q.db.QueryRowContext(ctx, selectWalletByMetamaskWalletID, walletID)
+func (q *Queries) SelectWalletByMetamaskWalletID(ctx context.Context, metamaskWalletID string) (Wallet, error) {
+	row := q.db.QueryRowContext(ctx, selectWalletByMetamaskWalletID, metamaskWalletID)
 	var i Wallet
 	err := row.Scan(
 		&i.WalletID,
 		&i.MetamaskWalletID,
+		&i.FollowWallet,
 		&i.IDUser,
 		&i.IDChain,
 		&i.LastBlockNumber,
@@ -103,12 +131,12 @@ update wallet
 set last_block_number = $1
 where wallet_id = $2
 and deleted is null
-RETURNING wallet_id, metamask_wallet_id, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
+RETURNING wallet_id, metamask_wallet_id, follow_wallet, id_user, id_chain, last_block_number, created_at, modified, deleted, wallet_name
 `
 
 type UpdateLastBlockNumberParams struct {
-	LastBlockNumber sql.NullInt32 `json:"last_block_number"`
-	WalletID        int32         `json:"wallet_id"`
+	LastBlockNumber int32 `json:"last_block_number"`
+	WalletID        int32 `json:"wallet_id"`
 }
 
 func (q *Queries) UpdateLastBlockNumber(ctx context.Context, arg UpdateLastBlockNumberParams) (Wallet, error) {
@@ -117,6 +145,7 @@ func (q *Queries) UpdateLastBlockNumber(ctx context.Context, arg UpdateLastBlock
 	err := row.Scan(
 		&i.WalletID,
 		&i.MetamaskWalletID,
+		&i.FollowWallet,
 		&i.IDUser,
 		&i.IDChain,
 		&i.LastBlockNumber,
