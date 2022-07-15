@@ -30,7 +30,7 @@ CREATE TABLE "event" (
 CREATE TABLE "line_owner_validation" (
                                          "id_line_owner_validation" serial PRIMARY KEY,
                                          "code" varchar NOT NULL,
-                                         "id_user" int,
+                                         "id_user" int NOT NULL,
                                          "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 

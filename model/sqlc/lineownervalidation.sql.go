@@ -7,7 +7,6 @@ package model
 
 import (
 	"context"
-	"database/sql"
 )
 
 const insertLineOwnerValidation = `-- name: InsertLineOwnerValidation :one
@@ -16,8 +15,8 @@ VALUES ($1, $2) RETURNING id_line_owner_validation, code, id_user, created_at
 `
 
 type InsertLineOwnerValidationParams struct {
-	Code   string        `json:"code"`
-	IDUser sql.NullInt32 `json:"id_user"`
+	Code   string `json:"code"`
+	IDUser int32  `json:"id_user"`
 }
 
 func (q *Queries) InsertLineOwnerValidation(ctx context.Context, arg InsertLineOwnerValidationParams) (LineOwnerValidation, error) {
@@ -40,7 +39,7 @@ order by id_line_owner_validation
         desc limit 1
 `
 
-func (q *Queries) SelectLastLineOwnerValidation(ctx context.Context, idUser sql.NullInt32) (LineOwnerValidation, error) {
+func (q *Queries) SelectLastLineOwnerValidation(ctx context.Context, idUser int32) (LineOwnerValidation, error) {
 	row := q.db.QueryRowContext(ctx, selectLastLineOwnerValidation, idUser)
 	var i LineOwnerValidation
 	err := row.Scan(

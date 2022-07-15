@@ -49,10 +49,10 @@ type LineEvent struct {
 }
 
 type LineOwnerValidation struct {
-	IDLineOwnerValidation int32         `json:"id_line_owner_validation"`
-	Code                  string        `json:"code"`
-	IDUser                sql.NullInt32 `json:"id_user"`
-	CreatedAt             time.Time     `json:"created_at"`
+	IDLineOwnerValidation int32     `json:"id_line_owner_validation"`
+	Code                  string    `json:"code"`
+	IDUser                int32     `json:"id_user"`
+	CreatedAt             time.Time `json:"created_at"`
 }
 
 type User struct {
