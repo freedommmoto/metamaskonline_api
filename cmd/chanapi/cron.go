@@ -18,9 +18,15 @@ func doEverySetTime(d time.Duration, f func(time.Time)) {
 }
 
 func checkTransaction(t time.Time) {
+
+	//for test one time only
+	//chText := make(chan string)
+	//controller.CallBSCCheckPerUser(chText, CronQueries, CainInfo, Config.BSCToken, Config.LINEToken)
+	//return
+
 	chText := make(chan string)
 	if CainInfo.ChainCode == "bsc-testnet" {
-		go controller.CallBSCCheckPerUser(chText, CronQueries, CainInfo)
+		go controller.CallBSCCheckPerUser(chText, CronQueries, CainInfo, Config.BSCToken, Config.LINEToken)
 	}
 	if CainInfo.ChainCode == "eth-testnet" {
 		go controller.CallETHCheckPerUser(chText, CronQueries, CainInfo)
@@ -31,6 +37,7 @@ func checkTransaction(t time.Time) {
 
 var CronQueries *db.Queries
 var CainInfo db.Chain
+var Config tool.ConfigObject
 
 func main() {
 	config, err := tool.LoadConfig(".")
@@ -49,5 +56,8 @@ func main() {
 		return
 	}
 	CainInfo = cain
-	doEverySetTime(time.Second*2, checkTransaction)
+	Config = config
+	//tool.AddErrorLogIntoFile("test 11")
+	//tool.AddApiLogIntoFile("test 2")
+	doEverySetTime(time.Second*4, checkTransaction)
 }

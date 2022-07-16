@@ -8,6 +8,8 @@ import (
 	"errors"
 	db "github.com/freedommmoto/metamaskonline_api/model/sqlc"
 	"github.com/freedommmoto/metamaskonline_api/tool"
+	uuid "github.com/google/uuid"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -218,5 +220,48 @@ func ReplyLineUserWithNormalText(messageStr string, ChannelToken string, lineReq
 	}
 
 	log.Println("response Body:", string(body))
+	return nil
+}
+
+func MakePushOneUserWithLineAPI(messageStr string, user db.User, ChannelToken string) error {
+	if !user.IDLine.Valid {
+		errors.New("no error line id for send !")
+	}
+	uuidData := uuid.New()
+	uuidDataStr := uuidData.String()
+
+	url := "https://api.line.me/v2/bot/message/push"
+	message := Message{
+		Type: "text",
+		Text: messageStr,
+	}
+	MessagePush := PushRequest{
+		To: user.IDLine.String,
+		Messages: []Message{
+			message,
+		},
+	}
+	value, _ := json.Marshal(MessagePush)
+	var jsonStr = []byte(value)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+ChannelToken)
+	req.Header.Add("X-Line-Retry-Key", uuidDataStr)
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Println("error after ReadAll", err)
+		return err
+	}
+	bodyString := string(bodyBytes)
+	log.Println("SendPushMessageLine retrun data : ", bodyString)
+
 	return nil
 }
