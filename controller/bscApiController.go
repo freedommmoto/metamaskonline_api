@@ -72,7 +72,7 @@ func CallBSCCheckPerUser(
 			}
 
 			//send alert to line
-			lineAlertStr, err := lib.MakePushTextForLineAlert(resultTx, wallet.MetamaskWalletID, wallet.WalletName.String)
+			lineAlertStr, err := lib.GetPushTextForLineAlert(resultTx, wallet.MetamaskWalletID, wallet.WalletName.String)
 			if err != nil {
 				tool.AddErrorLogIntoFile("MakeReplyTextForLineAlert :" + err.Error())
 				continue

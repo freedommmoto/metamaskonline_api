@@ -7,6 +7,7 @@ api connect to bscscan and line api
 brew install ngrok/ngrok/ngrok
 ngrok http 8888
 cd poc
+cp lineapi.go_ lineapi.go 
 vim lineapi.go 
 ****
 change tokenapi to you token 
@@ -22,6 +23,7 @@ enter any text on line channel
 2) make poc bsc api work 
 cd poc
 vim bscscanapi.go
+cp bscscanapi.go_ bscscanapi.go 
 ****
 change tokenapi to you token 
 you can get tokenapi for free by enter this link 
@@ -47,4 +49,11 @@ make test
 ****
 then check data in table event , line-event , block-event
 ****
+````
+
+````
+5) run live app
+go run cmd/chanapi/cron.go
+go run cmd/line-webhook/server.go 
+ngrok http 8888
 ````
