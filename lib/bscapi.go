@@ -11,6 +11,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type resultTx struct {
@@ -140,8 +141,8 @@ func GetLastBlockTransactionFromBscScan(CainInfo db.Chain, walletAddress string,
 	return tx, last, nil
 }
 
-func MakePushTextForLineAlert(r resultTx, walletAddress string, AccountName string) (string, error) {
-	if r.Result[0].Value == "" {
+func GetPushTextForLineAlert(r resultTx, walletAddress string, AccountName string) (string, error) {
+	if len(r.Result) < 1 {
 		return "", errors.New("No Result data for MakePushTextForLineAlert !")
 	}
 	value := r.Result[0].Value
@@ -161,9 +162,9 @@ func MakePushTextForLineAlert(r resultTx, walletAddress string, AccountName stri
 	textGetNewToken := "Hi " + AccountName + " you get a new " + tokenAmountStr + " " + tokenText + " (~" + usdAmountStr + " USD) transfer from account" + fromAccount + "!"
 	textSentNewToken := "Hi " + AccountName + " you have send " + tokenAmountStr + " " + tokenText + " (~" + usdAmountStr + " USD) transfer to account" + toAccount + "!"
 
-	textSendAleartToLine := textGetNewToken
-	if fromAccount == walletAddress {
-		textSendAleartToLine = textSentNewToken
+	textSendAlertToLine := textGetNewToken
+	if strings.ToLower(fromAccount) == strings.ToLower(walletAddress) {
+		textSendAlertToLine = textSentNewToken
 	}
-	return textSendAleartToLine, nil
+	return textSendAlertToLine, nil
 }

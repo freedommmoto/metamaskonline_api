@@ -2,3 +2,5 @@
 cron
 server
 app.env
+error.log
+api.log

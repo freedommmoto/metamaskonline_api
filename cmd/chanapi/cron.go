@@ -57,7 +57,6 @@ func main() {
 	}
 	CainInfo = cain
 	Config = config
-	//tool.AddErrorLogIntoFile("test 11")
-	//tool.AddApiLogIntoFile("test 2")
+
 	doEverySetTime(time.Second*4, checkTransaction)
 }
