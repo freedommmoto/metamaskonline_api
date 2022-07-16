@@ -13,6 +13,7 @@ type ConfigObject struct {
 	DBSource      string `mapstructure:"DB_SOUECE"`
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
 	LINEToken     string `mapstructure:"LINEToken"`
+	BSCToken      string `mapstructure:"BSCToken"`
 	RegisterUrl   string `mapstructure:"REGISTER_URL"`
 }
 type makeNewCustomer struct {
