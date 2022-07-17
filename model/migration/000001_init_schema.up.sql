@@ -30,8 +30,9 @@ CREATE TABLE "event" (
 CREATE TABLE "line_owner_validation" (
                                          "id_line_owner_validation" serial PRIMARY KEY,
                                          "code" varchar NOT NULL,
-                                         "id_user" int NULL,
-                                         "created_at" timestamp NOT NULL DEFAULT 'now()'
+                                         "id_user" int NOT NULL,
+                                         "created_at" timestamp NOT NULL DEFAULT 'now()',
+                                         "deleted" timestamp
 );
 
 CREATE TABLE "chain" (
@@ -94,7 +95,7 @@ ALTER TABLE "event" ADD FOREIGN KEY ("id_line_event") REFERENCES "line_event" ("
 
 ALTER TABLE "event" ADD FOREIGN KEY ("id_chain_event") REFERENCES "chain_event" ("id_chain_event");
 
--- ALTER TABLE "line_owner_validation" ADD FOREIGN KEY ("id_user") REFERENCES "users" ("id_user");
+ALTER TABLE "line_owner_validation" ADD FOREIGN KEY ("id_user") REFERENCES "users" ("id_user");
 
 ALTER TABLE "wallet" ADD FOREIGN KEY ("id_user") REFERENCES "users" ("id_user");
 
