@@ -52,7 +52,7 @@ VALUES (2, 'bsc', 'binance smart chain', 'https://api.bscscan.com/api');
 
 CREATE TABLE "users" (
                          "id_user" serial PRIMARY KEY,
-                         "username" varchar NOT NULL,
+                         "username" varchar unique NOT NULL,
                          "password" varchar NOT NULL,
                          "id_line" varchar,
                          "owner_validation" boolean NOT NULL DEFAULT false,
