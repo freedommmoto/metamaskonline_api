@@ -11,3 +11,6 @@ INSERT INTO wallet (wallet_id, metamask_wallet_id,follow_wallet, id_user, wallet
 VALUES (1, '0x891B68D6B21c64d56dB262D066B38Ea76B6468f6',false, 1, 'patara', 1, 0);
 INSERT INTO wallet (wallet_id, metamask_wallet_id,follow_wallet, id_user, wallet_name, id_chain, last_block_number)
 VALUES (2, '0x891B68D6B21c64d56dB262D066B38Ea76B6468f6',true, 1, 'freedom', 1, 0);
+
+SELECT pg_catalog.setval(pg_get_serial_sequence('users', 'id_user'), (SELECT MAX(id_user) FROM users)+1);
+SELECT pg_catalog.setval(pg_get_serial_sequence('wallet', 'wallet_id'), (SELECT MAX(wallet_id) FROM wallet)+1);
