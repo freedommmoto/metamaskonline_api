@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	lib "github.com/freedommmoto/metamaskonline_api/lib"
 	db "github.com/freedommmoto/metamaskonline_api/model/sqlc"
 	"github.com/freedommmoto/metamaskonline_api/tool"
@@ -31,77 +32,60 @@ func ReplyMessageLine(c echo.Context, mainQueries *db.Queries, config tool.Confi
 		return err
 	}
 
-	user, regis, err := lib.CheckProfileRegister(mainQueries, profile)
+	user, _, err := lib.CheckProfileRegisterFromDB(mainQueries, profile)
 	if err != nil {
 		log.Println("checkProfileRegister error :", err)
 		return err
 	}
+	isCorrectFormatCode := lib.CheckCodeFormatIs4Number(Line)
 
-	//regis = false // uncomment this line for test case 1
-	//case 1 user not in database yet mean user not register with UI yet.
-	if !regis {
-		messageStr := tool.GetLineText(1)
-		err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
-		if err != nil {
-			log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
-			return err
-		}
-		return nil
+	if user.OwnerValidation && user.IDUser > 0 {
+		//case 3 user active no need to do anything
+		sendTextToLine(4, ChannelToken, Line)
 	}
 
-	//case 2 user register on UI but not send validation code to line group yet.
-	if !user.OwnerValidation {
-		codeCorrect, err := lib.CheckCodeWithUserProfile(mainQueries, Line, user.IDUser)
+	if isCorrectFormatCode {
+		//case 2 check code
+		isCodeCorrect, userIDFromCode, idLineOwnerValidation, _ := lib.CheckCodeWithIn3Hr(mainQueries, Line)
+		if isCodeCorrect && userIDFromCode > 0 {
 
-		if codeCorrect {
-			//case 2.1 user send code correct format but not correct code ex : user send 2123 but in database is 8472
-			err = lib.UpdateUserOwnerValidation(mainQueries, user.IDUser)
+			//update user owner validation
+			err = lib.UpdateUserOwnerValidation(mainQueries, userIDFromCode)
 			if err != nil {
 				log.Println("UpdateUserOwnerValidation :", err)
 				return err
 			}
-
-			messageStr := tool.GetLineText(2)
-			err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
+			err = lib.UpdateLineIdByWhereUserIDParams(mainQueries, profile.UserID, userIDFromCode)
 			if err != nil {
-				log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+				log.Println("UpdateLineIdByWhereUserIDParams :", err)
 				return err
 			}
-		} else {
-			//case 2.2 user send code not correct format maybe send text for ask how system work maybe send a sicker
-			isCorrectFormatCode := lib.CheckCodeFormatIs4Number(Line)
-			if isCorrectFormatCode {
-				messageStr := tool.GetLineText(3)
-				err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
-				if err != nil {
-					log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
-					return err
-				}
 
-				_, err := lib.MakeNewCodeForNewUser(mainQueries, user.IDUser)
-				if err != nil {
-					log.Println("error makeNewCodeForNewUser :", err)
-					return err
-				}
-			} else {
-				messageStr := tool.GetLineText(4)
-				err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
-				if err != nil {
-					log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
-					return err
-				}
+			//error code that have been used map user with code and line id
+			_, errDeleteCode := mainQueries.DeleteLineOwnerValidation(context.Background(), idLineOwnerValidation)
+			if errDeleteCode != nil {
+				log.Println("DeleteLineOwnerValidation :", errDeleteCode)
+				return errDeleteCode
 			}
-		}
 
-	} else {
-		//case 3 user already register user no need to do any chat with line group only wait for alert from metamask action
-		messageStr := tool.GetLineText(5)
-		err = lib.ReplyLineUserWithNormalText(messageStr, ChannelToken, Line)
-		if err != nil {
-			log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
-			return err
+			//done update active user then update
+			sendTextToLine(3, ChannelToken, Line)
+
+		} else {
+			sendTextToLine(2, ChannelToken, Line)
 		}
+	} else {
+		//case 1 ask user to register first
+		sendTextToLine(1, ChannelToken, Line)
 	}
 
 	return nil
+}
+
+func sendTextToLine(caseID int, channelToken string, line *lib.LineMessage) {
+	messageStr := tool.GetLineText(caseID)
+	err := lib.ReplyLineUserWithNormalText(messageStr, channelToken, line)
+	if err != nil {
+		log.Println("ReplyLineUserWithNormalText :"+messageStr, err)
+	}
 }

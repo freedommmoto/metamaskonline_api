@@ -122,34 +122,34 @@ func CheckProfileRegisterFromDB(Queries *db.Queries, profile ProFile) (db.User, 
 	return userFromDB, true, nil
 }
 
-func CheckCodeWithIn3Hr(Queries *db.Queries, lineRequest *LineMessage) (bool, int32, error) {
+func CheckCodeWithIn3Hr(Queries *db.Queries, lineRequest *LineMessage) (bool, int32, int32, error) {
 	if len(lineRequest.Events) == 0 {
-		return false, int32(0), errors.New("no event for CheckCodeWithIn3Hr")
+		return false, int32(0), int32(0), errors.New("no event for CheckCodeWithIn3Hr")
 	}
 	lineOwnerValidation, err := Queries.SelectCodeUnConfirmWithIn3Houses(context.Background(), lineRequest.Events[0].Message.Text)
 	if err != nil {
-		return false, int32(0), err
+		return false, int32(0), int32(0), err
 	}
-	return true, lineOwnerValidation.IDUser.Int32, nil
+	return true, lineOwnerValidation.IDUser, lineOwnerValidation.IDLineOwnerValidation, nil
 }
 
-func CheckCodeWithUserProfile(Queries *db.Queries, lineRequest *LineMessage, userID int32) (bool, error) {
-	userIDarg := sql.NullInt32{
-		Int32: int32(userID),
-		Valid: true,
-	}
-
-	lineOwnerValidation, err := Queries.SelectLastLineOwnerValidation(context.Background(), userIDarg)
-	if err != nil {
-		return false, err
-	}
-	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineRequest.Events[0].Message.Text)
-	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineOwnerValidation.Code)
-	if lineOwnerValidation.Code == lineRequest.Events[0].Message.Text {
-		return true, nil
-	}
-	return false, nil
-}
+//func CheckCodeWithUserProfile(Queries *db.Queries, lineRequest *LineMessage, userID int32) (bool, error) {
+//	userIDarg := sql.NullInt32{
+//		Int32: int32(userID),
+//		Valid: true,
+//	}
+//
+//	lineOwnerValidation, err := Queries.SelectLastLineOwnerValidation(context.Background(), userIDarg)
+//	if err != nil {
+//		return false, err
+//	}
+//	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineRequest.Events[0].Message.Text)
+//	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineOwnerValidation.Code)
+//	if lineOwnerValidation.Code == lineRequest.Events[0].Message.Text {
+//		return true, nil
+//	}
+//	return false, nil
+//}
 
 func UpdateUserOwnerValidation(Queries *db.Queries, userID int32) error {
 	if userID < 1 {
