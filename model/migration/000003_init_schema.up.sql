@@ -1,12 +1,13 @@
 create
 or replace function fn_code_stage_modified() returns trigger as $psql$
 begin
-    if NEW.deleted > (now() - INTERVAL '1 minute'):: timestamp with time zone then
+    if NEW.deleted > (now() - INTERVAL '10 minute'):: timestamp with time zone then
     perform pg_notify(
             'code_confirm',NEW.id_user::varchar
         );
 return new;
 end if;
+return new;
 end;$psql$ language plpgsql;
 
 create trigger code_stage before
