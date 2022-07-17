@@ -7,20 +7,39 @@ package model
 
 import (
 	"context"
+	"database/sql"
 )
 
 const insertLineOwnerValidation = `-- name: InsertLineOwnerValidation :one
-INSERT INTO line_owner_validation (code, id_user)
-VALUES ($1, $2) RETURNING id_line_owner_validation, code, id_user, created_at
+INSERT INTO line_owner_validation (code)
+VALUES ($1) RETURNING id_line_owner_validation, code, id_user, created_at
 `
 
-type InsertLineOwnerValidationParams struct {
-	Code   string `json:"code"`
-	IDUser int32  `json:"id_user"`
+func (q *Queries) InsertLineOwnerValidation(ctx context.Context, code string) (LineOwnerValidation, error) {
+	row := q.db.QueryRowContext(ctx, insertLineOwnerValidation, code)
+	var i LineOwnerValidation
+	err := row.Scan(
+		&i.IDLineOwnerValidation,
+		&i.Code,
+		&i.IDUser,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
-func (q *Queries) InsertLineOwnerValidation(ctx context.Context, arg InsertLineOwnerValidationParams) (LineOwnerValidation, error) {
-	row := q.db.QueryRowContext(ctx, insertLineOwnerValidation, arg.Code, arg.IDUser)
+const selectCodeUnConfirmWithIn3Houses = `-- name: SelectCodeUnConfirmWithIn3Houses :one
+select id_line_owner_validation, code, id_user, created_at
+from line_owner_validation
+where true
+  and created_at > now() - INTERVAL '180 minutes'
+  and id_user is null
+  and code = $1
+order by id_line_owner_validation
+        desc limit 1
+`
+
+func (q *Queries) SelectCodeUnConfirmWithIn3Houses(ctx context.Context, code string) (LineOwnerValidation, error) {
+	row := q.db.QueryRowContext(ctx, selectCodeUnConfirmWithIn3Houses, code)
 	var i LineOwnerValidation
 	err := row.Scan(
 		&i.IDLineOwnerValidation,
@@ -39,8 +58,29 @@ order by id_line_owner_validation
         desc limit 1
 `
 
-func (q *Queries) SelectLastLineOwnerValidation(ctx context.Context, idUser int32) (LineOwnerValidation, error) {
+func (q *Queries) SelectLastLineOwnerValidation(ctx context.Context, idUser sql.NullInt32) (LineOwnerValidation, error) {
 	row := q.db.QueryRowContext(ctx, selectLastLineOwnerValidation, idUser)
+	var i LineOwnerValidation
+	err := row.Scan(
+		&i.IDLineOwnerValidation,
+		&i.Code,
+		&i.IDUser,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateUserIDtoLineOwnerValidation = `-- name: UpdateUserIDtoLineOwnerValidation :one
+UPDATE line_owner_validation SET id_user = $1 WHERE id_line_owner_validation = $2 RETURNING id_line_owner_validation, code, id_user, created_at
+`
+
+type UpdateUserIDtoLineOwnerValidationParams struct {
+	IDUser                sql.NullInt32 `json:"id_user"`
+	IDLineOwnerValidation int32         `json:"id_line_owner_validation"`
+}
+
+func (q *Queries) UpdateUserIDtoLineOwnerValidation(ctx context.Context, arg UpdateUserIDtoLineOwnerValidationParams) (LineOwnerValidation, error) {
+	row := q.db.QueryRowContext(ctx, updateUserIDtoLineOwnerValidation, arg.IDUser, arg.IDLineOwnerValidation)
 	var i LineOwnerValidation
 	err := row.Scan(
 		&i.IDLineOwnerValidation,

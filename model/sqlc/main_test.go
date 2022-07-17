@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -17,6 +18,12 @@ const (
 )
 
 func TestMain(m *testing.M) {
+	loc, errTime := time.LoadLocation("UTC")
+	if errTime != nil {
+		log.Println("unable to set time zone:", errTime)
+	}
+	time.Local = loc
+
 	connection, err := sql.Open(dbDriver, dbSource)
 	if err != nil {
 		log.Println("unable to connect db:", err)
