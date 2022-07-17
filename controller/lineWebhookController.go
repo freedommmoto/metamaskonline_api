@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"database/sql"
 	lib "github.com/freedommmoto/metamaskonline_api/lib"
 	db "github.com/freedommmoto/metamaskonline_api/model/sqlc"
 	"github.com/freedommmoto/metamaskonline_api/tool"
@@ -33,7 +34,7 @@ func ReplyMessageLine(c echo.Context, mainQueries *db.Queries, config tool.Confi
 	}
 
 	user, _, err := lib.CheckProfileRegisterFromDB(mainQueries, profile)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		log.Println("checkProfileRegister error :", err)
 		return err
 	}

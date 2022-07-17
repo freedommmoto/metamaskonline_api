@@ -6,7 +6,7 @@ CREATE TABLE "chain_event" (
                                "to_metamask_wallet_id" varchar NOT NULL,
                                "value" varchar NULL,
                                "log_event" text,
-                               "created_at" timestamp NOT NULL DEFAULT 'now()'
+                               "created_at" timestamp with time zone NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "line_event" (
@@ -17,22 +17,22 @@ CREATE TABLE "line_event" (
                               "response_log_event" text,
                               "error" boolean NOT NULL DEFAULT false,
                               "error_text" text,
-                              "created_at" timestamp NOT NULL DEFAULT 'now()'
+                              "created_at" timestamp with time zone NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "event" (
                          "id_event" bigserial PRIMARY KEY,
                          "id_line_event" serial NOT NULL,
                          "id_chain_event" serial NOT NULL,
-                         "created_at" timestamp NOT NULL DEFAULT 'now()'
+                         "created_at" timestamp with time zone NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "line_owner_validation" (
                                          "id_line_owner_validation" serial PRIMARY KEY,
                                          "code" varchar NOT NULL,
                                          "id_user" int NOT NULL,
-                                         "created_at" timestamp NOT NULL DEFAULT 'now()',
-                                         "deleted" timestamp
+                                         "created_at" timestamp with time zone NOT NULL DEFAULT 'now()',
+                                         "deleted" timestamp with time zone
 );
 
 CREATE TABLE "chain" (
@@ -40,8 +40,8 @@ CREATE TABLE "chain" (
                          "chain_code" varchar NOT NULL,
                          "chain_name" varchar NOT NULL,
                          "url_api" text,
-                         "created_at" timestamp NOT NULL DEFAULT 'now()',
-                         "modified" timestamp NOT NULL DEFAULT 'now()',
+                         "created_at" timestamp with time zone NOT NULL DEFAULT 'now()',
+                         "modified" timestamp with time zone NOT NULL DEFAULT 'now()',
                          "deleted" timestamp
 );
 
@@ -56,8 +56,8 @@ CREATE TABLE "users" (
                          "password" varchar NOT NULL,
                          "id_line" varchar,
                          "owner_validation" boolean NOT NULL DEFAULT false,
-                         "created_at" timestamp NOT NULL DEFAULT 'now()',
-                         "modified" timestamp NOT NULL DEFAULT 'now()',
+                         "created_at" timestamp with time zone NOT NULL DEFAULT 'now()',
+                         "modified" timestamp with time zone NOT NULL DEFAULT 'now()',
                          "deleted" timestamp
 );
 
@@ -68,9 +68,9 @@ CREATE TABLE "wallet" (
                           "id_user" int NOT NULL,
                           "id_chain" int DEFAULT 1,
                           "last_block_number" int NOT NULL DEFAULT 0,
-                          "created_at" timestamp NOT NULL DEFAULT 'now()',
-                          "modified" timestamp NOT NULL DEFAULT 'now()',
-                          "deleted" timestamp
+                          "created_at" timestamp with time zone NOT NULL DEFAULT 'now()',
+                          "modified" timestamp with time zone NOT NULL DEFAULT 'now()',
+                          "deleted" timestamp with time zone
 );
 
 CREATE INDEX ON "chain_event" ("from_metamask_wallet_id");

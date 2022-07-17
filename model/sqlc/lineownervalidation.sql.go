@@ -53,7 +53,7 @@ const selectCodeUnConfirmWithIn3Houses = `-- name: SelectCodeUnConfirmWithIn3Hou
 select id_line_owner_validation, code, id_user, created_at, deleted
 from line_owner_validation
 where true
-  and created_at > now() - INTERVAL '180 minutes'
+  and created_at:: timestamp with time zone > (now() - INTERVAL '180 minutes'):: timestamp with time zone
   and deleted is null
   and code = $1
 order by id_line_owner_validation
