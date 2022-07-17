@@ -31,7 +31,8 @@ CREATE TABLE "line_owner_validation" (
                                          "id_line_owner_validation" serial PRIMARY KEY,
                                          "code" varchar NOT NULL,
                                          "id_user" int NOT NULL,
-                                         "created_at" timestamp NOT NULL DEFAULT 'now()'
+                                         "created_at" timestamp NOT NULL DEFAULT 'now()',
+                                         "deleted" timestamp
 );
 
 CREATE TABLE "chain" (

@@ -104,7 +104,7 @@ func GetProfile(ChannelToken, userId string) (ProFile, error) {
 	return profile, nil
 }
 
-func CheckProfileRegister(Queries *db.Queries, profile ProFile) (db.User, bool, error) {
+func CheckProfileRegisterFromDB(Queries *db.Queries, profile ProFile) (db.User, bool, error) {
 	var err error
 	var userNil db.User
 
@@ -122,18 +122,34 @@ func CheckProfileRegister(Queries *db.Queries, profile ProFile) (db.User, bool, 
 	return userFromDB, true, nil
 }
 
-func CheckCodeWithUserProfile(Queries *db.Queries, lineRequest *LineMessage, userID int32) (bool, error) {
-	lineOwnerValidation, err := Queries.SelectLastLineOwnerValidation(context.Background(), userID)
+func CheckCodeWithIn3Hr(Queries *db.Queries, lineRequest *LineMessage) (bool, int32, int32, error) {
+	if len(lineRequest.Events) == 0 {
+		return false, int32(0), int32(0), errors.New("no event for CheckCodeWithIn3Hr")
+	}
+	lineOwnerValidation, err := Queries.SelectCodeUnConfirmWithIn3Houses(context.Background(), lineRequest.Events[0].Message.Text)
 	if err != nil {
-		return false, err
+		return false, int32(0), int32(0), err
 	}
-	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineRequest.Events[0].Message.Text)
-	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineOwnerValidation.Code)
-	if lineOwnerValidation.Code == lineRequest.Events[0].Message.Text {
-		return true, nil
-	}
-	return false, nil
+	return true, lineOwnerValidation.IDUser, lineOwnerValidation.IDLineOwnerValidation, nil
 }
+
+//func CheckCodeWithUserProfile(Queries *db.Queries, lineRequest *LineMessage, userID int32) (bool, error) {
+//	userIDarg := sql.NullInt32{
+//		Int32: int32(userID),
+//		Valid: true,
+//	}
+//
+//	lineOwnerValidation, err := Queries.SelectLastLineOwnerValidation(context.Background(), userIDarg)
+//	if err != nil {
+//		return false, err
+//	}
+//	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineRequest.Events[0].Message.Text)
+//	log.Println("CheckCodeWithUserProfile CheckCodeWithUserProfile : !!!!", lineOwnerValidation.Code)
+//	if lineOwnerValidation.Code == lineRequest.Events[0].Message.Text {
+//		return true, nil
+//	}
+//	return false, nil
+//}
 
 func UpdateUserOwnerValidation(Queries *db.Queries, userID int32) error {
 	if userID < 1 {
@@ -149,23 +165,60 @@ func UpdateUserOwnerValidation(Queries *db.Queries, userID int32) error {
 	return nil
 }
 
-func MakeNewCodeForNewUser(Queries *db.Queries, userID int32) (string, error) {
-	code := tool.RandomCodeNumber(4)
-	arg := db.InsertLineOwnerValidationParams{
-		IDUser: int32(userID),
-		Code:   code,
+func UpdateLineIdByWhereUserIDParams(Queries *db.Queries, lineid string, userID int32) error {
+	arg := db.UpdateLineIdByWhereUserIDParams{
+		IDLine: sql.NullString{String: lineid, Valid: true},
+		IDUser: userID,
 	}
-	lineOwner, err := Queries.InsertLineOwnerValidation(context.Background(), arg)
+	user, err := Queries.UpdateLineIdByWhereUserID(context.Background(), arg)
 	if err != nil {
-		return "", err
+		log.Println("UpdateLineIdByWhereUserID :", err)
+		return err
 	}
-	length := len([]rune(lineOwner.Code))
-	if length != 4 {
-		err = errors.New("code is not length 4")
-		return "", err
+	if user.IDLine.String != lineid {
+		return errors.New("id line after save is not same with line id profile")
 	}
-	return lineOwner.Code, nil
+	return nil
 }
+
+//func MakeNewCodeForNewUser(Queries *db.Queries, userID int32) (string, error) {
+//	code := tool.RandomCodeNumber(4)
+//	arg := db.InsertLineOwnerValidationParams{
+//		IDUser: int32(userID),
+//		Code:   code,
+//	}
+//	user, err := Queries.UpdateUserOwnerValidation(context.Background(), userID)
+//	if err != nil {
+//		return err
+//	}
+//	if user.IDUser != userID {
+//		errors.New("id user that update OwnerValidation not correct")
+//	}
+//	err = mainQueries.UpdateLineIdByWhereUserID(context.Background(), profile.UserID, userIDFromCode)
+//	if err != nil {
+//		log.Println("UpdateLineIdByWhereUserID :", err)
+//		return err
+//	}
+//	return nil
+//}
+
+//func MakeNewCodeForNewUser(Queries *db.Queries, userID int32) (string, error) {
+//	code := tool.RandomCodeNumber(4)
+//	arg := db.InsertLineOwnerValidationParams{
+//		IDUser: int32(userID),
+//		Code:   code,
+//	}
+//	lineOwner, err := Queries.InsertLineOwnerValidation(context.Background(), arg)
+//	if err != nil {
+//		return "", err
+//	}
+//	length := len([]rune(lineOwner.Code))
+//	if length != 4 {
+//		err = errors.New("code is not length 4")
+//		return "", err
+//	}
+//	return lineOwner.Code, nil
+//}
 
 func CheckCodeFormatIs4Number(lineRequest *LineMessage) bool {
 	message := lineRequest.Events[0].Message.Text

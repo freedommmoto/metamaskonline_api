@@ -9,11 +9,18 @@ import (
 	_ "github.com/lib/pq" //need this for connect postgres
 	"log"
 	"net/http"
+	"time"
 )
 
 var ApiQueries *db.Queries
 
 func main() {
+	//set time-zone
+	loc, errTime := time.LoadLocation("UTC")
+	if errTime != nil {
+		log.Println("unable to set time zone:", errTime)
+	}
+	time.Local = loc
 
 	config, err := tool.LoadConfig(".")
 	if err != nil {

@@ -95,6 +95,32 @@ func (q *Queries) SelectUserID(ctx context.Context, idUser int32) (User, error) 
 	return i, err
 }
 
+const updateLineIdByWhereUserID = `-- name: UpdateLineIdByWhereUserID :one
+UPDATE users SET id_line = $1 WHERE id_user = $2
+RETURNING id_user, username, password, id_line, owner_validation, created_at, modified, deleted
+`
+
+type UpdateLineIdByWhereUserIDParams struct {
+	IDLine sql.NullString `json:"id_line"`
+	IDUser int32          `json:"id_user"`
+}
+
+func (q *Queries) UpdateLineIdByWhereUserID(ctx context.Context, arg UpdateLineIdByWhereUserIDParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateLineIdByWhereUserID, arg.IDLine, arg.IDUser)
+	var i User
+	err := row.Scan(
+		&i.IDUser,
+		&i.Username,
+		&i.Password,
+		&i.IDLine,
+		&i.OwnerValidation,
+		&i.CreatedAt,
+		&i.Modified,
+		&i.Deleted,
+	)
+	return i, err
+}
+
 const updateUserOwnerValidation = `-- name: UpdateUserOwnerValidation :one
 update users
 set owner_validation = true

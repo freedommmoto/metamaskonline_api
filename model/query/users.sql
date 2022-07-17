@@ -21,3 +21,8 @@ update users
 set owner_validation = true
 where id_user = $1 RETURNING *;
 ;
+
+-- name: UpdateLineIdByWhereUserID :one
+UPDATE users SET id_line = $1 WHERE id_user = $2
+RETURNING *;
+;
